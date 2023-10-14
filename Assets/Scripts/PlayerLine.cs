@@ -11,6 +11,8 @@ public class PlayerLine : MonoBehaviour
 
     private LineRenderer lineRenderer;
     private PlayerController playerController;
+    // TODO: Or in the player controller?
+    private bool _lineBeingBuit;
 
     // Start is called before the first frame update
     void Start()
@@ -28,12 +30,13 @@ public class PlayerLine : MonoBehaviour
     public void DestroyLine()
     {
         lineRenderer.positionCount = 0;
+        _lineBeingBuit = false;
     }
 
     private void OnMouseDrag()
     {
         
-        //if (gameManager.isGameActive && !gameManager.isPaused)
+        if (/*gameManager.isGameActive && !gameManager.isPaused &&*/ !_lineBeingBuit)
         {
             var worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
             worldPoint.y = 1;
@@ -51,7 +54,6 @@ public class PlayerLine : MonoBehaviour
                 lineRenderer.positionCount++;
                 lineRenderer.SetPosition(lineRenderer.positionCount - 1, worldPoint);
             }
-
         }
     }
 
@@ -84,6 +86,7 @@ public class PlayerLine : MonoBehaviour
             var p = lineRenderer.GetPosition(i);
             points.Add(new Vector3(p.x, p.y, p.z));
         }
+        _lineBeingBuit = true;
         playerController.StartBuildingWall(new LineForWall(points, DestroyLine));
     }
 }
