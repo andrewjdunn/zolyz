@@ -8,6 +8,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject area;
     [SerializeField] private GameObject wallPrefab;
     [SerializeField] private GameObject wallsParent;
+    [SerializeField] private GameObject playerStateObject;
+
+    private PlayerState playerState;
 
     private const float speed = 3f;
     private Bounds areaBounds;
@@ -22,6 +25,7 @@ public class PlayerController : MonoBehaviour
     {
         areaBounds = area.GetComponent<BoxCollider>().bounds;
         wallBlockSize = 0.8;//wallPrefab.GetComponent<BoxCollider>().size.normalized.magnitude;
+        playerState = playerStateObject.GetComponent<PlayerState>();
     }
 
     // Update is called once per frame
@@ -30,11 +34,27 @@ public class PlayerController : MonoBehaviour
         MovePlayerAloneLine();
         //ConstrainPlayerInAreaBounds();
     }
+
+    public void TakePlayerLife()
+    {
+        Debug.Log($"Player lost a life {playerState.activePlayerState.livesLeft}");
+        DestroyPlayerLine();
+        playerState.LoseALife();
+        if (playerState.activePlayerState.livesLeft == 0)
+        {
+            Destroy(gameObject);
+        }
+        else
+        {
+            // TODO: Should introduce a reset method that gets called at start
+            gameObject.transform.position = new Vector3(0, 0, -9.5f);
+        }
+    }
     
-    public void DestroyPlayerLine()
+    private void DestroyPlayerLine()
     {
         linePositionTarget = int.MinValue;
-        lineToBuild.DestroyLine();
+        lineToBuild?.DestroyLine();
     }
 
     internal interface ILineForWall
@@ -73,7 +93,8 @@ public class PlayerController : MonoBehaviour
     }
     private void MovePlayerAloneLine()
     {
-        if(lineToBuild.Line?.Count > 0)
+        // TODO: Confused as to why I now need to ? the lineToBuild.. it looks like it always should of needed the ? as it can be null.. 
+        if(lineToBuild?.Line?.Count > 0)
         {
             if(linePositionTarget == int.MinValue)
             {
@@ -99,8 +120,7 @@ public class PlayerController : MonoBehaviour
                 var targetPoint = lineToBuild.Line[linePositionTarget];
                 var diff = (targetPoint - transform.position);
                 diff.y = 0;
-                var distance = diff.magnitude;
-                Debug.Log($"Distance {distance}");
+                var distance = diff.magnitude;                
                 if (distance < 0.1)
                 {
                     Debug.Log("Reached a line point - move to next");
