@@ -1394,6 +1394,10 @@ PrefabInstance:
       propertyPath: wallsParent
       value: 
       objectReference: {fileID: 1445137225}
+    - target: {fileID: 6514858531728115143, guid: f3715a0001cf40e4eb5fcda817d6ec3c, type: 3}
+      propertyPath: playerStateObject
+      value: 
+      objectReference: {fileID: 352338752}
     m_RemovedComponents:
     - {fileID: 3244294333755800992, guid: f3715a0001cf40e4eb5fcda817d6ec3c, type: 3}
     m_RemovedGameObjects: []
