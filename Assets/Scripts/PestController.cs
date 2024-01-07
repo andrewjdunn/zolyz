@@ -70,8 +70,7 @@ public class PestController : MonoBehaviour
         }
         else if (other.transform.root.CompareTag("Player"))
         {
-            playerController.DestroyPlayerLine();
-            Destroy(other.gameObject);
+            playerController.TakePlayerLife();
         }
         else if(other.transform.CompareTag("Wall"))
         {
