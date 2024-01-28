@@ -12,7 +12,8 @@ public class TestSafeArea
     {
         // Setup
         var bounds = new Bounds(new Vector3(0, 0, 0), new Vector3(100, 100));
-        SafeArea safeArea = new SafeArea(bounds);
+        var borderSize = new Vector3 (0.05f, 0, 0.05f);
+        SafeArea safeArea = new SafeArea(bounds, borderSize);
 
         // TODO: Bordersize is the number of blocks in the border * the size of a block - 10 is 1%...should blocks in border be exposed? or passed in..? 
         var BorderSizeX = 10 * safeArea.SizeOfBlock.x;
