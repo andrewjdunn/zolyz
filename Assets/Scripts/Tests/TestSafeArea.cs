@@ -1,8 +1,5 @@
-using System.Collections;
-using System.Collections.Generic;
 using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.TestTools;
 
 public class TestSafeArea
 {
@@ -11,50 +8,72 @@ public class TestSafeArea
     public void TestSafeAreaStartsWithBorder()
     {
         // Setup
-        var bounds = new Bounds(new Vector3(0, 0, 0), new Vector3(100, 100));
+        var bounds = new Bounds(new Vector3(0, 0, 0), new Vector3(100, 0, 100));
         var borderSize = new Vector3 (0.05f, 0, 0.05f);
-        SafeArea safeArea = new SafeArea(bounds, borderSize);
+        SafeArea safeArea = new(bounds, borderSize);
 
         // TODO: Bordersize is the number of blocks in the border * the size of a block - 10 is 1%...should blocks in border be exposed? or passed in..? 
-        var BorderSizeX = 10 * safeArea.SizeOfBlock.x;
-        var BorderSizeY = 10 * safeArea.SizeOfBlock.y;
-        // Expected overlay vector describes the inner and outer loop of the border - duplicated with a Y offset to make a block
-        // TODO: I'm not sure what is needed to make a mesh so this might change a lot :-)
+        var BorderSizeX = borderSize.x / safeArea.SizeOfBlock.x * 10;
+        var BorderSizeZ = borderSize.z / safeArea.SizeOfBlock.z * 10;
+
         var height = 1;
-        var expetedOverlayVector = new List<Vector3>
+
+        var expetedOverlayVector = new Vector3[]
         {
-            new Vector3(-100 + BorderSizeX, 0, -100 + BorderSizeY),
-            new Vector3(100 - BorderSizeX, 0, -100 + BorderSizeY),
-            new Vector3(100 - BorderSizeX, 0, 100 - BorderSizeY),
-            new Vector3(-100 + BorderSizeX, 0, 100 - BorderSizeY),
-            new Vector3(-100 + BorderSizeX, 0, -100 + BorderSizeY),
-            new Vector3(-100, 0, -100),
-            new Vector3(100, 0, -100),
+            new Vector3(0, 0, 0),
+            new Vector3(100, 0, 0),
+            new Vector3(BorderSizeX, 0, BorderSizeZ),
+            new Vector3(100 - BorderSizeX, 0, BorderSizeZ),
+
+            new Vector3(BorderSizeX, 0, 100 - BorderSizeZ),
+            new Vector3(100 - BorderSizeX, 0, 100 - BorderSizeZ),
+            new Vector3(0, 0, 100),
             new Vector3(100, 0, 100),
-            new Vector3(-100, 0, 100),
-            new Vector3(-100, 0, -100),
-            new Vector3(-100 + BorderSizeX, height, -100 + BorderSizeY),
-            new Vector3(100 - BorderSizeX, height, -100 + BorderSizeY),
-            new Vector3(100 - BorderSizeX, height, 100 - BorderSizeY),
-            new Vector3(-100 + BorderSizeX, height, 100 - BorderSizeY),
-            new Vector3(-100 + BorderSizeX, height, -100 + BorderSizeY),
-            new Vector3(-100, height, -100),
-            new Vector3(100, height, -100),
+
+            new Vector3(0, height, 0),
+            new Vector3(0, height, 100),
+            new Vector3(BorderSizeX, height, BorderSizeZ),
+            new Vector3(BorderSizeX, height, 100 - BorderSizeZ),
+
+            new Vector3(100 - BorderSizeX, height, BorderSizeZ),
+            new Vector3(100 - BorderSizeX, height, 100 - BorderSizeZ),
+            new Vector3(100, height, 0),
             new Vector3(100, height, 100),
-            new Vector3(-100, height, 100),
-            new Vector3(-100, height, -100)
+        };
+
+        var expetedOverlayTriangles = new[] {
+            // face 1
+            0, 9, 6, 0, 8, 9,
+            // face 2
+            2, 11, 4, 2, 10, 11,
+            // face 3
+            3, 13, 5, 3, 12, 13,
+            // face 4
+            1, 15, 7, 1, 14, 15,
+
+            // Face 5
+            0, 14, 1, 0, 8, 14,
+            // face 6
+            2, 12, 3, 2, 10, 12,
+            // face 7
+            4, 13, 5, 4, 11, 13,
+            // face 8
+            6, 15, 7, 6, 9, 15
         };
 
         // Test
-        var overlayVectors = safeArea.CreateSafeAreaOverlay();
+        safeArea.CreateSafeAreaOverlay();
+        var overlayVectors = safeArea.GetVectorsAsArray();
+        var overlayTriangles = safeArea.GetTrianglesAsArray();
 
         // Verify
         Assert.AreEqual(expetedOverlayVector, overlayVectors);
+        Assert.AreEqual(expetedOverlayTriangles, overlayTriangles);
 
     }
 
 
-    // TestSafeAreaStartsWith??? 
+    // TestSafeAreaStartsWith???
     // Add tests for No safe area - one where there is only one block left, and whatever you can thing off fuzz test!
 
 
